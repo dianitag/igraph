@@ -15,11 +15,12 @@ install.packages("gdata")#to import .csv files
 #read.xls("bla.xlsx", perl = "C:\\Perl64\\bin\\perl.exe")
   perl<-"C:/Perl64/bin/perl.exe" #needed for package gdata
   installXLSXsupport(perl = perl, verbose = TRUE)
+install.packages("ggplot2")
 
 ##### Load package####
 library(igraph)
 library(gdata)
-
+library(ggplot2)
 
 ####Load Adjacency matrix ####
 getwd()
@@ -63,17 +64,17 @@ el.adj
 
 ####test Graph #####
 #nohu.graph <- igraph::graph_from_adjacency_matrix(nohu.mat, mode="undirected", weighted=NULL) #with no weight
-#Wnohu.graph=igraph::graph_from_adjacency_matrix(nohu.mat,mode="undirected",weighted=TRUE,diag=FALSE) ###weighted
-Weuc.copy=get.adjacency(Weuc.graph.copy,attr= 'Weight')
-Weuc.copy.g<-igraph::graph_from_adjacency_matrix(Weuc.copy,mode="undirected",weighted=TRUE,diag=FALSE)
+Wnohu.graph=igraph::graph_from_adjacency_matrix(nohu.mat,mode="undirected",weighted=TRUE,diag=FALSE) ###weighted
+#Weuc.copy=get.adjacency(Weuc.graph.copy,attr= 'Weight')
+#Weuc.copy.g<-igraph::graph_from_adjacency_matrix(Weuc.copy,mode="undirected",weighted=TRUE,diag=FALSE)
 #Weuc.graph<- igraph::graph_from_adjacency_matrix(el.adj,mode="undirected",weighted=TRUE,diag=FALSE)
 #Weuc.graph1 <- graph_from_edgelist(el.mat, directed=FALSE)
 #view name of nodes(vertices)
 #V(Wnohu.graph)
 #V(Weuc.graph)
-V(Weuc.copy.g)
+#V(Weuc.copy.g)
 #Weuc.graph
-Weuc.copy.g
+#Weuc.copy.g
 #E(Weuc.graph)$Weight=as.numeric(el[,3])
 E(Weuc.copy.g)$weight
 
@@ -92,23 +93,26 @@ V(Wnohu.graph)$size=V(Wnohu.graph)$AREA
 v.size=(V(Wnohu.graph)$size)
 v.size=as.numeric(v.size)
 
-V(Weuc.graph)$AREA=as.character(node_attr$AREA[match(V(Weuc.graph)$name,node_attr$core_ID)])
+#V(Weuc.graph)$AREA=as.character(node_attr$AREA[match(V(Weuc.graph)$name,node_attr$core_ID)])
 #V(Weuc.graph)$AREA<-V(Weuc.graph)$AREA[!is.na(V(Weuc.graph)$AREA)] #remove NA's?
-V(Weuc.graph)$AREA
-V(Weuc.graph)$size=V(Weuc.graph)$AREA
-v.size=(V(Weuc.graph)$size)
-v.size=as.numeric(v.size)
+#V(Weuc.graph)$AREA
+#V(Weuc.graph)$size=V(Weuc.graph)$AREA
+#v.size=(V(Weuc.graph)$size)
+#v.size=as.numeric(v.size)
 
-V(Weuc.copy.g)$AREA=as.character(node_attr$AREA[match(V(Weuc.copy.g)$name,node_attr$core_ID)])
-#V(Weuc.graph)$AREA<-V(Weuc.graph)$AREA[!is.na(V(Weuc.graph)$AREA)] #remove NA's?
-V(Weuc.graph)$AREA
-V(Weuc.graph)$size=V(Weuc.graph)$AREA
-v.size=(V(Weuc.graph)$size)
-v.size=as.numeric(v.size)
+#V(Weuc.copy.g)$AREA=as.character(node_attr$AREA[match(V(Weuc.copy.g)$name,node_attr$core_ID)])
+#V(Weuc.copy.g)$AREA<-V(Weuc.copy.g)$AREA[!is.na(V(Weuc.copy.g)$AREA)] #remove NA's?
+#V(Weuc.copy.g)$AREA
+#V(Weuc.copy.g)$size=V(Weuc.copy.g)$AREA
+#v.size=(V(Weuc.copy.g)$size)
+#v.size=as.numeric(v.size)
 
 ##edges
 E(Weuc.graph)$weight<-E(Weuc.graph)$weight[!is.na(E(Weuc.graph)$weight)]##remove NA's?
 E(Weuc.graph)$weight
+
+E(Weuc.copy.g)$weight<-E(Weuc.copy.g)$weight[!is.na(E(Weuc.copy.g)$weight)]##remove NA's?
+E(Weuc.copy.g)$weight
 
 ## Add coordinates to nodes#
 #You can add the coordinates directly to the graph object in igraph by setting the an X and Y attributes to the vertices
@@ -117,8 +121,8 @@ coords <- layout.norm(as.matrix(node_attr[, c("Longitude","Latitude")]))
 plot(Wnohu.graph, vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=coords, rescale=T, edge.width=E(Wnohu.graph)$weight)
 str(Wnohu.graph)
 
-plot(Weuc.graph, vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=coords, rescale=T, edge.width=E(Weuc.graph)$Weight/100000)
-str(Weuc.graph)
+#plot(Weuc.graph, vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=coords, rescale=T, edge.width=E(Weuc.graph)$Weight/100000)
+#str(Weuc.graph)
 
 #delete unwanted edges
 Wnohu.graph.copy <- delete.edges(Wnohu.graph, which(E(Wnohu.graph)$weight >= 1)-1)
@@ -126,13 +130,17 @@ plot(Wnohu.graph.copy,vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layou
      edge.width=E(Wnohu.graph)$weight, edge.curved=0.5  )
 
 #Weuc.graph.copy<-delete.edges(Weuc.graph, which(E(Weuc.graph)$Weight > 79000)-1)
-Weuc.graph.copy=delete.edges(Weuc.graph, which(E(Weuc.graph)$Weight <=79000)) # here's my condition.
-Weuc.graph.copy=delete.vertices(Weuc.graph.copy,which(degree(Weuc.graph.copy)<1))
+#Weuc.graph.copy=delete.edges(Weuc.graph, which(E(Weuc.graph)$Weight <=79000)) # here's my condition.
+#Weuc.graph.copy=delete.vertices(Weuc.graph.copy,which(degree(Weuc.graph.copy)<1))
 #Weuc.graph.copy<-delete.edges(Weuc.graph, which(E(Weuc.graph)$Weight >= 79000))
 
 E(Weuc.graph.copy)$Weight
-plot(Weuc.graph.copy,vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=coords, rescale=T, 
+plot(Weuc.graph.copy,vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=lgl, rescale=T, 
      edge.width=E(Weuc.graph.copy)$Weight/1000, edge.curved=0.5  )
+
+Weuc.copy.g.copy <- delete.edges(Weuc.copy.g, which(E(Weuc.copy.g)$weight <= 90000)-1)
+plot(Weuc.copy.g.copy,vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=coords, rescale=T, 
+     edge.width=E(Weuc.copy.g.copy)$weight/100000000, edge.curved=0.5  )
 
 
 
@@ -141,6 +149,10 @@ dd<-degree_distribution(Wnohu.graph.copy, v = V(Wnohu.graph.copy), cumulative = 
 ed<-edge_density(Wnohu.graph.copy, loops = FALSE)
 t<-transitivity(Wnohu.graph.copy, v = V(Wnohu.graph.copy), type = c("weighted"), isolates = c("NaN", "zero"))
 
+dd<-degree_distribution(Weuc.copy.g.copy, v = V(Weuc.copy.g.copy), cumulative = FALSE, mode = c("all"))
+ed<-edge_density(Weuc.copy.g.copy, loops = FALSE)
+t<-transitivity(Weuc.copy.g.copy, v = V(Weuc.copy.g.copy), type = c("weighted"), isolates = c("NaN", "zero"))
+
 ####Calculate clustering C(k)####
 # calculate the number of connections per node
 # calculate the clustering of each node
@@ -148,6 +160,13 @@ k<-degree(Wnohu.graph.copy)
 C <- transitivity(Wnohu.graph.copy, type = "weighted")
 L <- mean_distance(Wnohu.graph.copy)
 Pk<-degree(Wnohu.graph.copy)
+
+Weuc.copy.g.copy
+k<-degree(Weuc.copy.g.copy)
+C <- transitivity(Weuc.copy.g.copy, type = "weighted")
+L <- mean_distance(Weuc.copy.g.copy)
+Pk<-degree(Weuc.copy.g.copy)
+
 # mean clustering of all nodes with k links
 Ck <- rep(0, max(k))
 for (i in 1:max(k)){
@@ -161,7 +180,7 @@ RWnohu.graph <- sample_degseq(Pk, in.deg=NULL, method="simple")
 CR <- transitivity(RWnohu.graph, type="average")
 LR <- mean_distance(RWnohu.graph)
 # Compare yours with random
-(C/CR)/(L/LR) >= 0.012*vcount(Wnohu.graph.copy)^1.11
+(C/CR)/(L/LR) >= 0.012*vcount(Weuc.copy.g.copy)^1.11
 
 ######Check if graph is small world######
 ## Function to estimate the presence of a small-world organization
@@ -212,11 +231,12 @@ is.smallworld = function(graph, rep=1000){
   }
 }
 
-is.smallworld(Wnohu.graph.copy)
+#is.smallworld(Wnohu.graph.copy)
+is.smallworld(Weuc.copy.g.copy)
 
 #####Scale-free####
-degree = 1:max(degree(Wnohu.graph.copy, mode = "all"))
-dd = degree_distribution(Wnohu.graph.copy, mode="all", cumulative=T)
+degree = 1:max(degree(Weuc.copy.g.copy, mode = "all"))
+dd = degree_distribution(Weuc.copy.g.copy, mode="all", cumulative=T)
 probability = dd[-1]
 # delete 0s
 nonzero.position = which(probability != 0)
@@ -276,13 +296,13 @@ is.scalefree = function(graph, cumulative = c(TRUE, FALSE)){
   curve(power.law.fit, col = "red", add = T, n = length(d)) 
 }
 
-scalefree<-is.scalefree(Wnohu.graph.copy, cumulative = c(TRUE))
+scalefree<-is.scalefree(Weuc.copy.g.copy, cumulative = c(TRUE))
 ####Is my Network Hierarchical?#####
 #The script is the same, only that instead of frequency now we calculate the average C of nodes with the same k
 
 #cluster = transitivity(graph, type="local", isolates="NaN")
-cluster = transitivity(Wnohu.graph.copy, type="local", isolates="NaN")
-d=degree(Wnohu.graph.copy)
+cluster = transitivity(Weuc.copy.g.copy, type="local", isolates="NaN")
+d=degree(Weuc.copy.g.copy)
 
 for (i in 1:max(d)){
   probability[i]=mean(cluster[d==i], na.rm=TRUE)
@@ -341,7 +361,8 @@ is.hierarchy = function(graph, cumulative = c(TRUE, FALSE)){
   
 }
 
-is.hierarchy(Wnohu.graph.copy) 
+#is.hierarchy(Wnohu.graph.copy) 
+is.hierarchy(Weuc.copy.g.copy) 
 
 plot(probability~degree, log="xy", xlab="ki", ylab="C(k)", col=1)
 curve(power.law.fit, col="red", add=T, n=length(d))
@@ -357,7 +378,7 @@ plot(barabasi)
 #Geometric networks (Proximity model)
 
 ###Modular####
-modular <- cluster_optimal(Wnohu.graph.copy)
+modular <- cluster_optimal(Weuc.copy.g.copy)
 modular
 
 try({
@@ -369,6 +390,37 @@ try({
   print(modularity(g, membership(oc)))
   
   ## Compare to the greedy optimizer
-  fc <- cluster_fast_greedy(g)
+  fc <- cluster_fast_greedy(Weuc.copy.g.copy)
   print(modularity(fc))
 }, silent=TRUE)
+
+###Graphs###
+#Degree distribution#
+#Weuc.copy.g.copy.deg <- degree(Weuc.copy.g.copy) # List of degrees
+Wnohu.graph.copy.deg <- degree(Wnohu.graph.copy)
+#Weuc.copy.g.copy.histogram <- as.data.frame(table(Weuc.copy.g.copy.deg)) # Let's count the frequencies of each degree
+Wnohu.graph.copy.histogram <- as.data.frame(table(Wnohu.graph.copy.deg))
+# Need to convert the first column to numbers, otherwise
+# the log-log thing will not work (that's fair...)
+#Weuc.copy.g.copy.histogram[,1] <- as.numeric(Weuc.copy.g.copy.histogram[,1])
+Wnohu.graph.copy.histogram[,1] <- as.numeric(Wnohu.graph.copy.histogram[,1])
+# Now, plot it!
+ggplot(Wnohu.graph.copy.histogram, aes(x = Wnohu.graph.copy.deg, y = Freq)) +
+  geom_point() +
+  scale_x_continuous("Degree\n(nodes with this amount of connections)",
+                     breaks = c(1, 3, 10, 30, 100, 300),
+                     trans = "log10") +
+  scale_y_continuous("Frequency\n(how many of them)",
+                     breaks = c(1, 3, 10, 30, 100, 300, 1000),
+                     trans = "log10") +
+  ggtitle("Degree Distribution (log-log)") +
+  theme_bw()
+
+##Graph#
+cut.off <- 0.6
+  #mean(E(Wnohu.graph.copy)$weight)
+net.sp <- delete_edges(Wnohu.graph.copy, E(Wnohu.graph.copy)[weight>cut.off])
+plot(net.sp,vertex.size=v.size/1000000, vertex.label.cex=c(0.5), layout=coords, rescale=T, edge.width=E(Wnohu.graph.copy)$weight)
+
+modular <- cluster_optimal(net.sp)
+modular
